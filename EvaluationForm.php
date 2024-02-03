@@ -131,29 +131,14 @@ require_once('core/controller.Class.php');
                     <button type="submit">ส่งแบบประเมิน</button>
                 </form>
             </div>
-        <?php
+    <?php
         }
     } else {
-        ?>
-        <img src="img/RMUTK-LOGO-01.jpg" alt="" style="display: block; margin: 0 auto; max-width: 150px;">
-        <form action="" method="POST">
-            <div class="form-group">
-                <label for="exampleInputEmail">Email Address</label>
-                <input type="email" class="form-control" id="exampleInputEmail" placeholder="Enter email">
-            </div>
 
-            <div style="margin-bottom: 5px" class="form-group">
-                <label for="exampleInputPassword">Password</label>
-                <input type="password" class="form-control" id="exampleInputPassword" placeholder="Enter password">
-            </div>
-
-            <button type="submit" class="btn btn-primary">Login</button>
-
-            <button onclick="window.location ='<?php echo $login_url; ?>'" type="button" class="btn btn-danger">Login With Google</button>
-
-            <p>Not yet a member? <a href="register.php">Sign up</a></p>
-        </form>
-    <?php } ?>
+        header('Location: index.php');
+        exit();
+    }
+    ?>
 
 </body>
 

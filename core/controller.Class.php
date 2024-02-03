@@ -11,6 +11,7 @@ class Connect extends PDO
         );
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        
     }
 }
 
@@ -82,7 +83,7 @@ class Controller
     {
         header('Location: EvaluationForm.php');
         exit(); // Ensure that no further code is executed after the redirect
-  
+
     }
 
 
@@ -105,32 +106,18 @@ class Controller
 
 
 
-    // //เข๊ค ผู้ใช้ถ้าผู้ใช้ login
-    // function checkUserStatus($id, $sess)
-    // {
-    //     $db = new Connect;
-    //     $user = $db->prepare("SELECT id FROM users WHERE id=:id AND session=:session");
-    //     $user->execute([
-    //         ':id'       => intval($id),
-    //         ':session'  => $sess
-    //     ]);
-    //     $userInfo = $user->fetch(PDO::FETCH_ASSOC);
-    //     if (!$userInfo["id"]) {
-    //         return FALSE;
-    //     } else {
-    //         return TRUE;
-    //     }
-    // }
 
-    // function checkUserExists($email)
-    // {
-    //     $db = new Connect;
-    //     $checkUser = $db->prepare("SELECT * FROM users WHERE email=:email");
-    //     $checkUser->execute(['email' => $email]);
-    //     $userInfo = $checkUser->fetch(PDO::FETCH_ASSOC);
 
-    //     return !empty($userInfo); // Returns true if user exists, false otherwise
-    // }
+
+    function checkUserExists($email)
+    {
+        $db = new Connect;
+        $checkUser = $db->prepare("SELECT * FROM users WHERE email=:email");
+        $checkUser->execute(['email' => $email]);
+        $userInfo = $checkUser->fetch(PDO::FETCH_ASSOC);
+
+        return !empty($userInfo); // Returns true if user exists, false otherwise
+    }
 
     //genarate char
     function generateCode($lenght)
@@ -185,4 +172,8 @@ class Controller
             exit();
         }
     }
+
+   
+
+
 }

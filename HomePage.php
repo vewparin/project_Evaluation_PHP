@@ -82,6 +82,7 @@ session_start();
 </head>
 
 <body>
+    
     <header>
         <h1>Welcome to the Teacher Evaluation System</h1>
     </header>

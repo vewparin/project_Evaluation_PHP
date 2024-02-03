@@ -27,6 +27,7 @@ require_once('core/controller.Class.php');
         padding: 8px 16px;
         text-decoration: none;
         border-radius: 4px;
+        margin-bottom: 15px;
     }
 
     .btn-primary {
@@ -67,48 +68,48 @@ require_once('core/controller.Class.php');
         text-align: right;
         font: bold;
     }
+    p a {
+        color: #3498db; /* Set the link color */
+        text-decoration: none; /* Remove underlines from links */
+        font-weight: bold; /* Make the text bold */
+        transition: color 0.3s ease-in-out; /* Add a smooth color transition effect */
+    }
+
+    p a:hover {
+        color: #1f618d; /* Change the link color on hover */
+    }
 </style>
 
 <body>
     <div class="container" style="margin-top: 100px;">
-        
+
         <?php
-        if (isset($_COOKIE['id']) && isset($_COOKIE['sess'])) {
-            $Controller = new Controller;
+            if (isset($_COOKIE['id']) && isset($_COOKIE['sess'])) {
+                $Controller = new Controller;
 
-            if ($Controller->checkUserStatus($_COOKIE['id'], $_COOKIE['sess'])) {
-                // Fetch user ID from cookies
-                $userID = $_COOKIE['id'];
-                // Display logout button
-                echo '<div class="btn-container top-right">';
-                echo '<a href="logout.php" class="btn-logout">ออกจากระบบ</a>';
-                echo '</div>';
-                
-                echo '<div class="user-info">';
-                echo '<div class="user-info"><strong>' . $Controller->printName($userID) . '</strong></div>';
-                echo '</div>';
+                if ($Controller->checkUserStatus($_COOKIE['id'], $_COOKIE['sess'])) {
+                    // Fetch user ID from cookies
+                    $userID = $_COOKIE['id'];
+                    // Display logout button
+                    echo '<div class="btn-container top-right">';
+                    echo '<a href="logout.php" class="btn-logout">ออกจากระบบ</a>';
+                    echo '</div>';
 
-                $Controller->printEvaluationForm(); // Replace with your actual logic to get the user's email
-            }
-        } else { ?>
-            <img src="img/RMUTK-LOGO-01.jpg" alt="" style="display: block; margin: 0 auto; max-width: 150px;">
-            <form action="" method="POST">
-                <div class="form-group">
-                    <label for="exampleInputEmail">Email Address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail" placeholder="Enter email">
-                </div>
+                    echo '<div class="user-info">';
+                    echo '<div class="user-info"><strong>' . $Controller->printName($userID,$db) . '</strong></div>';
+                    echo '</div>';
 
-                <div style="margin-bottom: 5px" class="form-group">
-                    <label for="exampleInputPassword">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword" placeholder="Enter password">
-                </div>
-
-                <button type="submit" class="btn btn-primary">Login</button>
-
-                <button onclick="window.location ='<?php echo $login_url; ?>'" type="button" class="btn btn-danger">Login With Google</button>
-                
-                <p>Not yet a member? <a href="register.php">Sign up</a></p>
-            </form>
+                    $Controller->printEvaluationForm(); // Replace with your actual logic to get the user's email
+                    
+                }
+            } 
+            else { ?>
+                <img src="img/RMUTK-LOGO-01.jpg" alt="" style="display: block; margin: 0 auto; max-width: 150px;">
+                <form action="login_process.php" method="POST">                
+                    <button onclick="window.location ='<?php echo $login_url; ?>'" type="button" class="btn btn-danger">Login With Google</button>
+                    <p>Log in with Email&Password <a href="login.php">Login</a></p>
+                    <p>Not yet a member? <a href="register.php">Sign up</a></p>
+                </form>
 
         <?php } ?>
     </div>
