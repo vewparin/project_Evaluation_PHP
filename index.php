@@ -107,7 +107,7 @@ require_once('core/controller.Class.php');
                 <img src="img/RMUTK-LOGO-01.jpg" alt="" style="display: block; margin: 0 auto; max-width: 150px;">
                 <form action="login_process.php" method="POST">                
                     <button onclick="window.location ='<?php echo $login_url; ?>'" type="button" class="btn btn-danger">Login With Google</button>
-                    <p>Log in with Email&Password <a href="login.php">Login</a></p>
+                    <p>Log in with Email&Password <a href="login.php" >Login</a></p>
                     <p>Not yet a member? <a href="register.php">Sign up</a></p>
                 </form>
 

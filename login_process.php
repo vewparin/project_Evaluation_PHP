@@ -1,25 +1,38 @@
 <?php
 require_once('core/controller.Class.php');
-$Controller = new Controller;
+require_once('controller.php');
+
+// Include your Connect class definition and checkUserStatus function definition here
+
+// Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // กำหนดให้ฟิลด์ของฟอร์มชื่อ 'email'
+    // Retrieve form data
     $email = $_POST["email"];
+    $password = $_POST["password"];
 
-    // ตรวจสอบความถูกต้องของอีเมล (คุณอาจต้องการเพิ่มการตรวจสอบเพิ่มเติม)
-    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        // สมมติว่าคุณมีอินสแตนซ์คลาสเพื่อเรียกใช้เมธอดเพื่อตรวจสอบข้อมูลผู้ใช้
-        $isUserValid = $Controller->checkUserCredentials($email);
+    // Perform authentication (you might want to use password_hash and password_verify for secure password handling)
+    // Assuming you have a function like authenticateUser, update it accordingly
+    
+    $userId = $Controller->authenticateUser($email, $password);
 
-        if ($isUserValid) {
-            // ผู้ใช้ถูกต้อง, เปลี่ยนเส้นทางไปที่หน้าหลักหรือหน้าอื่น ๆ
-            header('Location: HomePage.php');
-            exit();
-        } else {
-            // ไม่พบผู้ใช้หรือข้อมูลเข้าสู่ระบบไม่ถูกต้อง
-            echo "ข้อมูลเข้าสู่ระบบไม่ถูกต้อง โปรดลองอีกครั้ง";
-        }
+    if ($userId !== false) {
+        // Authentication successful
+        $session = $Controller->generateSession(); // You need to implement a function to generate a session
+        $db = new Connect;
+        
+        // Update the user's session in the database
+        $updateSession = $db->prepare("UPDATE users SET session=:session WHERE id=:id");
+        $updateSession->execute([
+            ':session' => $session,
+            ':id' => $userId,
+        ]);
+
+        // Redirect the user to a secured page or perform other actions
+        header("Location: HomePage.php");
+        exit();
     } else {
-        echo "รูปแบบอีเมลไม่ถูกต้อง โปรดป้อนที่อยู่อีเมลที่ถูกต้อง";
+        // Authentication failed
+        echo "Invalid credentials. Please try again.";
     }
 }
 ?>

@@ -11,7 +11,6 @@ class Connect extends PDO
         );
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        
     }
 }
 
@@ -104,6 +103,30 @@ class Controller
         }
     }
 
+    function authenticateUser($email, $password)
+    {
+        $db = new Connect;
+
+        // Retrieve user information based on the provided email
+        $getUser = $db->prepare("SELECT id, password FROM users WHERE email = :email");
+        $getUser->execute([':email' => $email]);
+        $userInfo = $getUser->fetch(PDO::FETCH_ASSOC);
+
+        // Check if the user exists and the password is correct
+        if ($userInfo && password_verify($password, $userInfo['password'])) {
+            return $userInfo['id']; // Return the user ID if authentication is successful
+        } else {
+            return false; // Return false if authentication fails
+        }
+    }
+    function generateSession()
+    {
+        // Generate a random string for the session ID
+        $sessionId = bin2hex(random_bytes(32)); // 32 bytes provides a reasonably secure session ID
+
+        return $sessionId;
+    }
+
 
 
 
@@ -172,8 +195,4 @@ class Controller
             exit();
         }
     }
-
-   
-
-
 }
