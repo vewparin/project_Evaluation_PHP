@@ -91,7 +91,8 @@ require_once('core/controller.Class.php');
     if (isset($_COOKIE['id']) && isset($_COOKIE['sess'])) {
         $Controller = new Controller;
 
-        if ($Controller->checkUserStatus($_COOKIE['id'], $_COOKIE['sess'])) {
+        if ($Controller->checkUserStatus($_COOKIE['id'], $_COOKIE['sess']) ) {
+            
             // Fetch user ID from cookies
             $userID = $_COOKIE['id'];
             // Display logout button
@@ -133,6 +134,7 @@ require_once('core/controller.Class.php');
             </div>
     <?php
         }
+        
     } else {
 
         header('Location: index.php');

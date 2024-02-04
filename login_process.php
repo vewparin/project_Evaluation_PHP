@@ -1,38 +1,34 @@
 <?php
 require_once('core/controller.Class.php');
-require_once('controller.php');
 
-// Include your Connect class definition and checkUserStatus function definition here
-
-// Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve form data
-    $email = $_POST["email"];
-    $password = $_POST["password"];
+    // Assuming your form fields are named 'email' and 'password'
+    $data = [
+        "email"    => $_POST["email"],
+        "password" => $_POST["password"],
+    ];
 
-    // Perform authentication (you might want to use password_hash and password_verify for secure password handling)
-    // Assuming you have a function like authenticateUser, update it accordingly
-    
-    $userId = $Controller->authenticateUser($email, $password);
+    // Perform validation on form data if needed
 
-    if ($userId !== false) {
-        // Authentication successful
-        $session = $Controller->generateSession(); // You need to implement a function to generate a session
-        $db = new Connect;
-        
-        // Update the user's session in the database
-        $updateSession = $db->prepare("UPDATE users SET session=:session WHERE id=:id");
-        $updateSession->execute([
-            ':session' => $session,
-            ':id' => $userId,
-        ]);
+    $Controller = new Controller;
+    $db = new Connect;
+    $checkUser = $db->prepare("SELECT * FROM users WHERE email=:email");
+    $checkUser->execute(['email' => $data["email"]]);
+    $info = $checkUser->fetch(PDO::FETCH_ASSOC);
 
-        // Redirect the user to a secured page or perform other actions
-        header("Location: HomePage.php");
-        exit();
+    if ($info) {
+        // Check if the provided password matches the stored hashed password
+        if (password_verify($data["password"], $info["password"])) {
+            $Controller->loginWithSession($info['id'], $info["session"]);
+        } else {
+            // Password does not match, redirect to login page or handle authentication failure
+            header('Location: ImportCSVPage.php');
+            exit();
+        }
     } else {
-        // Authentication failed
-        echo "Invalid credentials. Please try again.";
+        // User not found, redirect to login page or handle authentication failure
+        header('Location: index.php');
+        exit();
     }
 }
 ?>

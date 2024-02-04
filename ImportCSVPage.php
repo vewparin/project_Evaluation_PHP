@@ -1,146 +1,162 @@
-<style>
-    /* Style for the status message */
-    .alert {
-        padding: 15px;
-        margin-bottom: 20px;
-        border: 1px solid transparent;
-        border-radius: 4px;
-    }
-
-    .alert-success {
-        color: #3c763d;
-        background-color: #dff0d8;
-        border-color: #d6e9c6;
-    }
-
-    .alert-danger {
-        color: #a94442;
-        background-color: #f2dede;
-        border-color: #ebccd1;
-    }
-
-    /* Style for the import button */
-    .btn-success {
-        background-color: #5cb85c;
-        border-color: #4cae4c;
-        color: #fff;
-    }
-
-    /* Style for the CSV file upload form */
-    #importFrm {
-        margin-top: 20px;
-    }
-
-    /* Style for the data list table */
-    .table {
-        width: 100%;
-        max-width: 100%;
-        margin-bottom: 20px;
-    }
-
-    .thead-dark {
-        background-color: #343a40;
-        color: #fff;
-    }
-
-    /* Style for the "No member(s) found..." message */
-    .table td[colspan="5"] {
-        text-align: center;
-    }
-</style>
-
 <?php
-// Load the database configuration file
-include_once 'core/controller.Class.php';
+require_once('core/controller.Class.php');
 $db = new Connect;
-
-// Get status message
-$statusType = isset($_GET['status']) ? $_GET['status'] : '';
-$statusMsg = '';
-
-switch ($statusType) {
-    case 'succ':
-        $statusType = 'alert-success';
-        $statusMsg = 'Members data has been imported successfully.';
-        break;
-    case 'err':
-        $statusType = 'alert-danger';
-        $statusMsg = 'Some problem occurred, please try again.';
-        break;
-    case 'invalid_file':
-        $statusType = 'alert-danger';
-        $statusMsg = 'Please upload a valid CSV file.';
-        break;
-}
-
 ?>
 
-<!-- Display status message -->
-<?php if (!empty($statusMsg)) { ?>
-    <div class="col-xs-12">
-        <div class="alert <?= $statusType; ?>"><?= $statusMsg; ?></div>
-    </div>
-<?php } ?>
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="row">
-    <!-- Import link -->
-    <div class="col-md-12 head">
-        <div class="float-right">
-            <a href="javascript:void(0);" class="btn btn-success" onclick="formToggle('importFrm');">
-                <i class="plus"></i> Import
-            </a>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Management</title>
+
+    <!-- Add Bootstrap and FontAwesome CDN links -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
+    <style>
+        /* Your existing styles remain here */
+
+        /* Improved header styling */
+        .page-header {
+            background-color: #343a40;
+            color: #fff;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Consistent button styling */
+        .btn {
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+        .btn-success{
+            margin-bottom: 12px;
+        }
+
+        #importFrm {
+            margin-top: 20px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #importFrm input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        #importFrm input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: 1px solid #007bff;
+        }
+
+        #importFrm input[type="submit"]:hover {
+            background-color: #0056b3;
+            border: 1px solid #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Improved header -->
+        <div class="row">
+            <div class="col-md-12 page-header">
+                <h2>Member Management</h2>
+            </div>
+        </div>
+
+        <!-- Display status message -->
+        <?php if (!empty($statusMsg)) { ?>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="alert <?= $statusType; ?>"><?= $statusMsg; ?></div>
+                </div>
+            </div>
+        <?php } ?>
+
+        <div class="row">
+            <!-- Import link -->
+            <div class="col-md-12">
+                <div class="float-right">
+                    <button class="btn btn-success" onclick="formToggle('importFrm')">
+                        <i class="fas fa-plus"></i> Import
+                    </button>
+                    <!-- Add other buttons here if needed -->
+                </div>
+            </div>
+
+            <!-- CSV file upload form -->
+            <div class="col-md-12" id="importFrm" style="display: none;">
+                <form action="importData.php" method="post" enctype="multipart/form-data">
+                    <input type="file" name="file" class="form-control-file">
+                    <input type="submit" class="btn btn-primary" name="importSubmit" value="IMPORT">
+                </form>
+            </div>
+
+            <!-- Data list table -->
+            <div class="col-md-12">
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>#ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // Get member rows
+                        $stmt = $db->query("SELECT * FROM members ORDER BY id DESC");
+                        if ($stmt) {
+                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        ?>
+                                <tr>
+                                    <td><?= $row['id']; ?></td>
+                                    <td><?= $row['name']; ?></td>
+                                    <td><?= $row['email']; ?></td>
+                                    <td><?= $row['phone']; ?></td>
+                                    <td><?= $row['status']; ?></td>
+                                    <td>
+                                        <a href="deleteData.php?id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this member?');">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php
+                            }
+                        } else {
+                            ?>
+                            <tr>
+                                <td colspan="6">No member(s) found...</td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- CSV file upload form -->
-    <div class="col-md-12" id="importFrm" style="display: none;">
-        <form action="importData.php" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" />
-            <input type="submit" class="btn btn-primary" name="importSubmit" value="IMPORT">
-        </form>
-    </div>
+    <!-- Show/hide CSV upload form -->
+    <script>
+        function formToggle(ID) {
+            var element = document.getElementById(ID);
+            element.style.display = (element.style.display === "none") ? "block" : "none";
+        }
+    </script>
 
-    <!-- Data list table -->
-    <table class="table table-striped table-bordered">
-        <thead class="thead-dark">
-            <tr>
-                <th>#ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            // Get member rows
-            $stmt = $db->query("SELECT * FROM members ORDER BY id DESC");
-            if ($stmt) {
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            ?>
-                    <tr>
-                        <td><?= $row['id']; ?></td>
-                        <td><?= $row['name']; ?></td>
-                        <td><?= $row['email']; ?></td>
-                        <td><?= $row['phone']; ?></td>
-                        <td><?= $row['status']; ?></td>
-                    </tr>
-            <?php
-                }
-            } else {
-            ?>
-                <tr>
-                    <td colspan="5">No member(s) found...</td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-</div>
+    <!-- Add Bootstrap and Popper.js CDN links -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<!-- Show/hide CSV upload form -->
-<script>
-    function formToggle(ID) {
-        var element = document.getElementById(ID);
-        element.style.display = (element.style.display === "none") ? "block" : "none";
-    }
-</script>
+</body>
+
+</html>

@@ -31,14 +31,19 @@ if(isset($_POST['importSubmit'])){
                 
                 // Check whether member already exists in the database with the same email
                 $prevQuery = "SELECT id FROM members WHERE email = '".$line[1]."'";
-                $prevResult = $db->query($prevQuery);
                 
-                if($prevResult->num_rows > 0){
-                    // Update member data in the database
-                    $db->query("UPDATE members SET name = '".$name."', phone = '".$phone."', status = '".$status."', modified = NOW() WHERE email = '".$email."'");
-                }else{
-                    // Insert member data in the database
-                    $db->query("INSERT INTO members (name, email, phone, created, modified, status) VALUES ('".$name."', '".$email."', '".$phone."', NOW(), NOW(), '".$status."')");
+                $prevResult = $db->query($prevQuery);
+
+                if ($prevResult !== null) {
+                    $numRows = $prevResult->rowCount();
+                
+                    if ($numRows > 0) {
+                        // Update member data in the database
+                        $db->query("UPDATE members SET name = '".$name."', phone = '".$phone."', status = '".$status."', modified = NOW() WHERE email = '".$email."'");
+                    } else {
+                        // Insert member data in the database
+                        $db->query("INSERT INTO members (name, email, phone, created, modified, status) VALUES ('".$name."', '".$email."', '".$phone."', NOW(), NOW(), '".$status."')");
+                    }
                 }
             }
             

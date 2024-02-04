@@ -103,35 +103,6 @@ class Controller
         }
     }
 
-    function authenticateUser($email, $password)
-    {
-        $db = new Connect;
-
-        // Retrieve user information based on the provided email
-        $getUser = $db->prepare("SELECT id, password FROM users WHERE email = :email");
-        $getUser->execute([':email' => $email]);
-        $userInfo = $getUser->fetch(PDO::FETCH_ASSOC);
-
-        // Check if the user exists and the password is correct
-        if ($userInfo && password_verify($password, $userInfo['password'])) {
-            return $userInfo['id']; // Return the user ID if authentication is successful
-        } else {
-            return false; // Return false if authentication fails
-        }
-    }
-    function generateSession()
-    {
-        // Generate a random string for the session ID
-        $sessionId = bin2hex(random_bytes(32)); // 32 bytes provides a reasonably secure session ID
-
-        return $sessionId;
-    }
-
-
-
-
-
-
     function checkUserExists($email)
     {
         $db = new Connect;
@@ -194,5 +165,31 @@ class Controller
             header('Location: HomePage.php');
             exit();
         }
+    }
+
+    function loginWithSession($id, $session)
+    {
+        $db = new Connect;
+        $checkUser = $db->prepare("SELECT * FROM users WHERE id=:id AND session=:session");
+        $checkUser->execute([
+            'id' => intval($id), 
+            'session' => $session
+        ]);
+        $info = $checkUser->fetch(PDO::FETCH_ASSOC);
+    
+        if ($info) {
+            setcookie("id", $info['id'], time() + 60 * 60 * 24 * 30, "/", NULL);
+            setcookie("sess", $info["session"], time() + 60 * 60 * 24 * 30, "/", NULL);
+            header('Location: ImportCSVPage.php');
+            exit();
+        } else {
+            // Redirect to login page or handle authentication failure
+            header('Location: index.php');
+            exit();
+        }
+    }
+
+    public function isLoggedIn() {
+        return isset($_COOKIE['id']) && isset($_COOKIE['sess']);
     }
 }
