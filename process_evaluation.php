@@ -3,7 +3,7 @@ require_once 'core/controller.Class.php'; // Include the Connect class
 
 try {
     $db = new Connect;
-
+    var_dump($_COOKIE);
     // Check if user is logged in
     if (isset($_COOKIE['id']) && isset($_COOKIE['sess'])) {
         $Controller = new Controller;

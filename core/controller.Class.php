@@ -85,7 +85,122 @@ class Controller
 
     }
 
-
+    function EvaluationForm($id)
+    {
+        $db = new Connect;
+        $user = $db->prepare("SELECT email FROM users WHERE id = :id");
+        $user->execute([':id' => $id]);
+        $content = '
+            <style>
+            .form-container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f5f5f5;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+    
+            .form-group {
+                margin-bottom: 15px;
+            }
+    
+            label {
+                display: block;
+                margin-bottom: 5px;
+            }
+    
+            input,
+            textarea {
+                width: 100%;
+                padding: 8px;
+                box-sizing: border-box;
+                margin-bottom: 10px;
+            }
+    
+            button {
+                background-color: #4caf50;
+                color: #fff;
+                padding: 10px 15px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+    
+            button:hover {
+                background-color: #45a049;
+            }
+    
+            .btn-danger {
+                background-color: #d9534f;
+                color: #fff;
+                padding: 10px 15px;
+                text-decoration: none;
+                border-radius: 5px;
+            }
+    
+            .btn-danger:hover {
+                background-color: #c9302c;
+            }
+    
+            .top-right {
+                position: absolute;
+                top: 50px;
+            }
+    
+            .btn-logout {
+                background-color: #d9534f;
+                color: #fff;
+                padding: 5px;
+                text-decoration: none;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+    
+            .btn-logout:hover {
+                background-color: #c9302c;
+            }
+            </style>';
+    
+        $content .= '<div class="form-container">
+            <h2>แบบประเมินการสอน</h2>
+            <form action="evaluationFormEmail.php" method="post">
+                <div class="form-group">
+                    <label for="teacher_name">ชื่อครูผู้สอน:</label>
+                    <input type="text" name="teacher_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject">วิชาที่สอน:</label>
+                    <input type="text" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label for="rating">คะแนนการสอน (1-10):</label>
+                    <input type="number" name="rating" min="1" max="10" required>
+                </div>
+                <div class="form-group">
+                    <label for="comments">ความคิดเห็น:</label>
+                    <textarea name="comments" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="email">อีเมล:</label>
+                    <input type="email" name="email" value="';
+    
+        while ($userInfo = $user->fetch(PDO::FETCH_ASSOC)) {
+            $content .= $userInfo["email"];
+        }
+    
+        $content .= '" required>
+                </div>
+                <button type="submit">ส่งแบบประเมิน</button>
+            </form>
+        </div>';
+    
+        echo $content;
+    }
+    
     function checkUserStatus($id, $sess)
     {
         $db = new Connect;
@@ -169,6 +284,7 @@ class Controller
 
     function loginWithSession($id, $session)
     {
+        $Controller = new Controller;
         $db = new Connect;
         $checkUser = $db->prepare("SELECT * FROM users WHERE id=:id AND session=:session");
         $checkUser->execute([
@@ -180,7 +296,7 @@ class Controller
         if ($info) {
             setcookie("id", $info['id'], time() + 60 * 60 * 24 * 30, "/", NULL);
             setcookie("sess", $info["session"], time() + 60 * 60 * 24 * 30, "/", NULL);
-            header('Location: ImportCSVPage.php');
+            $Controller->EvaluationForm($id);
             exit();
         } else {
             // Redirect to login page or handle authentication failure
@@ -189,7 +305,5 @@ class Controller
         }
     }
 
-    public function isLoggedIn() {
-        return isset($_COOKIE['id']) && isset($_COOKIE['sess']);
-    }
+
 }

@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $Controller->loginWithSession($info['id'], $info["session"]);
         } else {
             // Password does not match, redirect to login page or handle authentication failure
-            header('Location: ImportCSVPage.php');
+           $Controller->EvaluationForm($info['id']);
             exit();
         }
     } else {
